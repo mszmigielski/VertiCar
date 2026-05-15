@@ -5,9 +5,8 @@
 
 
 
- HoverDriver::HoverDriver(Stream& port) {
+ HoverDriver::HoverDriver(Stream& port) : _port(port) {
     // Konstruktor inicjalizujący referencję do portu szeregowego
-    _port = port;
     Command.start = (uint16_t)START_FRAME;
     Command.steer = 0;
     Command.speed = 0;

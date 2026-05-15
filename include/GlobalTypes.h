@@ -23,3 +23,4 @@ typedef struct {
    uint16_t cmdLed;
    uint16_t checksum;
 } __attribute__((packed)) SerialFeedback;
+//To do: wywalić typedef
