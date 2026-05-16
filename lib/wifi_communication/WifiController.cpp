@@ -6,13 +6,38 @@
 #include "WifiController.h"
 #include <WebSocketsServer.h>
 #include <ArduinoJson.h>
+#include <LittleFS.h>
+
+
+
+
 
 void WifiController::initAP(const char*ssid, const char* password) {
+
+    if (!LittleFS.begin(true)) { 
+        Serial.println("Błąd montowania systemu plików LittleFS!");
+    } else {
+        Serial.println("LittleFS zamontowany pomyślnie.");
+    }
+
     WiFi.softAP(ssid, password);
     _webSocket.onEvent([this](uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
         this->onWebSocketEvent(num, type, payload, length);
     });
+
+    _httpServer.on("/", [this](){
+        if(LittleFS.exists("/index.html")) {
+            File file = LittleFS.open("/index.html", "r");
+            _httpServer.streamFile(file, "text/html");
+            file.close();
+        }
+        else {
+            _httpServer.send(404, "text/plain", "404 Not found");
+        }      
+    });
+    _httpServer.begin();
 }
+
 
 
 void WifiController::onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * palyload, size_t length){
@@ -52,6 +77,7 @@ void WifiController::onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * paly
 
 void WifiController::loop() {
     _webSocket.loop();
+    _httpServer.handleClient();
     //watchdog
     if (millis() - _lastPacketTime > 500) { // Jeśli minęło więcej niż 5 sekund od ostatniego pakietu
         _currentCommand = {0, 0}; // Resetuj komendę do bezpiecznej wartości

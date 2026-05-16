@@ -1,9 +1,11 @@
 #pragma once
 #include <Arduino.h>
+
+// Val [-1, 1]
 typedef struct{
-    int16_t speed;
-    int16_t steer;
-} HoverboardCommand;
+    float speed;
+    float steer;
+} SpeedCommand;
 
 typedef struct {
    uint16_t start;

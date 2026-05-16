@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>VertiCar Control</title>
+        <style>
+            body { 
+                font-family: Arial;
+                text-align: center;
+                margin-top: 50px;
+                background-color: #222;
+                color: white;
+                }
+            #status {
+                font-size: 24px;
+                font-weight: bold;
+                color: red;
+                }
+            .data {
+                font-family: monospace;
+                font-size: 20px;
+                color: #00ff00;
+                margin-top: 20px;
+                }
+        </style>
+    </head>
+    <body>
+        <h1>VertiCar Control</h1>
+        <div id="status">Connecting... (Press any key to start)</div>
+        <div class="data">X: <span id="valX">0</span> | Y: <span id="valY">0</span></div>
+        <script>
+            // Connect to server
+            const ws = new WebSocket('ws://' + window.location.hostname + ':81/');
+            ws.onopen = () => {console.log('Connected'); };
+            ws.oncolose = () => { console.log('Disconnected');};
+
+            // Printing received data
+            const statusEl = document.getElementById('status');
+            const valXEl = document.getElementById('valX');
+            const valYEl = document.getElementById('valY');
+
+            // Read controller
+            function updateGamepad() {
+                const gamepads = navigator.getGamepads();
+                const gp = gamepads[0]; // Assuming the first gamepad is used
+                if (gp) {
+                    statusEl.innerText = 'Controller connected.';
+                    statusEl.style.color = "lime";
+                    let x = gp.axes[0]; // Left stick X-axis
+                    let y = gp.axes[1]; // Left stick Y-axis
+                    if (Math.abs(x) < 0.1) x = 0; // Deadzone
+                    if (Math.abs(y) < 0.1) y = 0; // Deadzone
+                    
+                    valXEl.innerText = x;
+                    valYEl.innerText = y;
+                    if (ws.readyState ===  WebSocket.OPEN) {
+                        const msg = JSON.stringify({t: "ctrl", x: x, y: y});
+                        ws.send(msg);
+                    }
+                }
+                else {
+                    statusEl.innerText = 'No controller detected. Please connect a gamepad and press any key.';
+                    statusEl.style.color = "red";
+                }
+                requestAnimationFrame(updateGamepad);
+            }
+            updateGamepad();
+        </script>
+    </body>
+</html>

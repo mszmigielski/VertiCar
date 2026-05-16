@@ -7,9 +7,10 @@ private:
     Stream& _port;  // Referencja do portu szeregowego
     SerialCommand Command;
     SerialFeedback Feedback;
-    void sendCommand(HoverboardCommand& cmd);
+    int16_t constraintSpeed = MAX_SPEED;
+    void sendCommand();
     void receiveFeedback();
 public:
     HoverDriver(Stream& port) : _port(port) {}
-    void move(HoverboardCommand& cmd);
+    void move(SpeedCommand& cmd);
 };

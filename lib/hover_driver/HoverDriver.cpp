@@ -12,10 +12,8 @@
     Command.speed = 0;
 }
 
-void HoverDriver::sendCommand(HoverboardCommand& cmd) {
+void HoverDriver::sendCommand() {
     Command.start    = (uint16_t)START_FRAME;
-    Command.steer    = cmd.steer;
-    Command.speed    = cmd.speed;
     Command.checksum = (uint16_t)(Command.start ^ Command.steer ^ Command.speed);
 
   // Wysłanie paczki bajtów do płyty przez sprzętowy port
@@ -62,7 +60,9 @@ void HoverDriver::receiveFeedback() {
 }
 
 
-void HoverDriver::move(HoverboardCommand& cmd){
-    sendCommand(cmd);
+void HoverDriver::move(SpeedCommand& cmd){
+    Command.steer = (int16_t)(cmd.steer * constraintSpeed);
+    Command.speed = (int16_t)(cmd.speed * constraintSpeed);
+    sendCommand();
     receiveFeedback();
 }
