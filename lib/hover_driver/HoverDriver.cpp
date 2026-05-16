@@ -21,40 +21,40 @@ void HoverDriver::sendCommand() {
 
 void HoverDriver::receiveFeedback() {
     static uint8_t idx = 0;
-    uint16_t bufStartFrame;
-    byte incomingByte;
-    static byte incomingBytePrev;
-    SerialFeedback UnVerifiedFeedback;
+    static byte incomingBytePrev = 0;
+    static SerialFeedback UnVerifiedFeedback; 
 
-    if(_port.available()) {
-        incomingByte = _port.read();
-        bufStartFrame = ((uint16_t)(incomingByte) << 8) | incomingBytePrev;
-    } else {
-        return;
-    }
-    if (bufStartFrame == START_FRAME) {                     
-       byte* byteBuffer = (byte*)&UnVerifiedFeedback;
-        byteBuffer[0] = incomingBytePrev;
-        byteBuffer[1] = incomingByte;
-        idx = 2;
-    } else if (idx >= 2 && idx < sizeof(SerialFeedback)) {  
-        byte* byteBuffer = (byte*)&UnVerifiedFeedback;
-        byteBuffer[idx] = incomingByte; // Bezpieczne wpisywanie indeksowe
-        idx++;
-    }
-    if (idx == sizeof(SerialFeedback)) {
-        uint16_t checksum;
-        idx = 0;
-        checksum = (uint16_t)(UnVerifiedFeedback.start ^ UnVerifiedFeedback.cmd1 ^ UnVerifiedFeedback.cmd2 ^ 
-                              UnVerifiedFeedback.speedR_meas ^ UnVerifiedFeedback.speedL_meas ^ 
-                              UnVerifiedFeedback.batVoltage ^ UnVerifiedFeedback.boardTemp ^ UnVerifiedFeedback.cmdLed);
+    while (_port.available()) { 
+        byte incomingByte = _port.read();
+        uint16_t bufStartFrame = ((uint16_t)(incomingByte) << 8) | incomingBytePrev;
 
-        if (UnVerifiedFeedback.checksum == checksum) {
-            Feedback = UnVerifiedFeedback;
-        } else {
-            // To Do: Obsługa błędu sumy kontrolnej (np. logowanie, ponowne żądanie danych itp.)
+        if (bufStartFrame == START_FRAME) {                     
+            byte* byteBuffer = (byte*)&UnVerifiedFeedback;
+            byteBuffer[0] = incomingBytePrev;
+            byteBuffer[1] = incomingByte;
+            idx = 2;
+        } else if (idx >= 2 && idx < sizeof(SerialFeedback)) {  
+            byte* byteBuffer = (byte*)&UnVerifiedFeedback;
+            byteBuffer[idx] = incomingByte; 
+            idx++;
         }
-    incomingBytePrev = incomingByte;
+
+        if (idx == sizeof(SerialFeedback)) {
+            uint16_t checksum;
+            idx = 0; 
+            
+            checksum = (uint16_t)(UnVerifiedFeedback.start ^ UnVerifiedFeedback.cmd1 ^ UnVerifiedFeedback.cmd2 ^ 
+                                  UnVerifiedFeedback.speedR_meas ^ UnVerifiedFeedback.speedL_meas ^ 
+                                  UnVerifiedFeedback.batVoltage ^ UnVerifiedFeedback.boardTemp ^ UnVerifiedFeedback.cmdLed);
+
+            if (UnVerifiedFeedback.checksum == checksum) {
+                Feedback = UnVerifiedFeedback;
+            } else {
+               
+            }
+        }
+        
+        incomingBytePrev = incomingByte; 
     }
 }
 

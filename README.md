@@ -16,3 +16,10 @@ This is a presonal portfolio projekt where the goal is to gain knowledge and exp
 - reliable controll algorithm 
 - reliable communication 
 - implemented safety management 
+
+
+### HoverBoard UART connector pinout
+- red - gnd
+- blue - RX
+- green - TX
+- black - 12V !!!

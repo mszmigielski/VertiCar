@@ -6,7 +6,7 @@
 #define HOVER_RX_PIN 8  // Podłącz do TX płyty Hoverboarda
 #define HOVER_TX_PIN 18  // Podłącz do RX płyty Hoverboarda
 #define START_FRAME         0xABCD
-#define MAX_SPEED           100 // Maksymalna prędkość (dostosuj do potrzeb)
+#define MAX_SPEED           50 // Maksymalna prędkość (dostosuj do potrzeb)
 
 // Konfiguracja dla WiFi
 #define WIFI_SSID "VertiCar_AP"

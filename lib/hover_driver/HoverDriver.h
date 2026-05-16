@@ -14,3 +14,4 @@ public:
     HoverDriver(Stream& port);
     void move(SpeedCommand& cmd);
 };
+// To Do: dodać publiczną metodę odczytu danych
