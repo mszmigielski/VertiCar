@@ -24,31 +24,20 @@ void setup() {
 
 void loop() {
   wifiController.loop();
-/*
+  SpeedCommand com;
   static uint32_t lastPrintMs = 0;
   if (millis() - lastPrintMs >= 50) { // 20 Hz
     lastPrintMs = millis();
     const SpeedCommand cmd = wifiController.getCommand();
+    com = cmd; // Kopiujemy do lokalnej zmiennej, by mieć stabilne dane podczas debugowania
     Serial.print(cmd.speed); 
     Serial.println(cmd.steer);
   }
-*/
-  SpeedCommand cmd = {1,0};
-  hoverDriver.move(cmd);
-  Serial.println("Test move forward");
-  delay(1000);
-  cmd = {-1,0};
-  hoverDriver.move(cmd);
-  Serial.println("Test move backward");
-  delay(1000);
-  cmd = {0,1};
-  hoverDriver.move(cmd);
-  Serial.println("Test move left");
-  delay(1000);
-  cmd = {0,-1};
-  hoverDriver.move(cmd);
-  Serial.println("Test move right");
-  delay(1000);
-  delay(1); // daje czas schedulerowi/USB/WiFi
+
+  
+  hoverDriver.move(com);
+  //Serial.println("Test move forward");
+
+  //delay(1); // daje czas schedulerowi/USB/WiFi
   
 }
