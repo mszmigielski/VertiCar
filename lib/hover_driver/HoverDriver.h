@@ -11,6 +11,6 @@ private:
     void sendCommand();
     void receiveFeedback();
 public:
-    HoverDriver(Stream& port) : _port(port) {}
+    HoverDriver(Stream& port);
     void move(SpeedCommand& cmd);
 };
