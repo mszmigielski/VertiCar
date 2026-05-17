@@ -30,8 +30,8 @@ void loop() {
     lastPrintMs = millis();
     const SpeedCommand cmd = wifiController.getCommand();
     com = cmd; // Kopiujemy do lokalnej zmiennej, by mieć stabilne dane podczas debugowania
-    Serial.print(cmd.speed); 
-    Serial.println(cmd.steer);
+    //Serial.print(cmd.speed); 
+    //Serial.println(cmd.steer);
   }
 
   

@@ -49,8 +49,8 @@
                     statusEl.style.color = "lime";
                     let x = gp.axes[0]; // Left stick X-axis
                     let y = gp.axes[1]*(-1); // Left stick Y-axis
-                    if (Math.abs(x) < 0.1) x = 0; // Deadzone
-                    if (Math.abs(y) < 0.1) y = 0; // Deadzone
+                    if (Math.abs(x) < 0.2) x = 0; // Deadzone
+                    if (Math.abs(y) < 0.2) y = 0; // Deadzone
                     
                     valXEl.innerText = x;
                     valYEl.innerText = y;
