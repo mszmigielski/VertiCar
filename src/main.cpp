@@ -1,43 +1,58 @@
-#include <Arduino.h>
-#include "config.h"
-#include "GlobalTypes.h"
-#include "HoverDriver.h"
-#include "WifiController.h"
+#include "VescUart.h"
 
-// Definicje globalnych obiektów
- // Używamy sprzętowego UART1
-WifiController wifiController;
-HoverDriver hoverDriver(Serial1);
+// Tworzymy obiekt obsługujący VESC
+VescUart Vesc;
+
 void setup() {
-  // Inicjalizacja portu USB do debugowania na komputerze
+  // Port Serial0 (USB) do podglądu danych na komputerze (Monitor Portu Szeregowego)
   Serial.begin(9600);
-  while (!Serial) { delay(10); }
-  Serial.println("Uruchamianie VertiCar...");
+  while (!Serial) { ; } // Czekaj na otwarcie monitora
 
-  wifiController.initAP(WIFI_SSID, WIFI_PASSWORD);
-  Serial.println("Punkt dostępowy WiFi uruchomiony.");
+  // Port Serial2 do komunikacji z VESC (dla ESP32 piny RX=16, TX=17, dla Mega piny RX=17, TX=16)
+  // Jeśli używasz Arduino Mega, wpisz po prostu: Serial2.begin(115200);
+  Serial2.begin(115200, SERIAL_8N1, 16, 17); 
 
-  Serial1.begin(HOVER_SERIAL_BAUD, SERIAL_8N1, HOVER_RX_PIN, HOVER_TX_PIN);
-  Serial.println("Port szeregowy do Hoverboarda uruchomiony.");
+  // Powiązanie biblioteki z fizycznym portem Serial2
+  Vesc.setSerialPort(&Serial2);
 }
 
-
 void loop() {
-  wifiController.loop();
-  SpeedCommand com;
-  static uint32_t lastPrintMs = 0;
-  if (millis() - lastPrintMs >= 50) { // 20 Hz
-    lastPrintMs = millis();
-    const SpeedCommand cmd = wifiController.getCommand();
-    com = cmd; // Kopiujemy do lokalnej zmiennej, by mieć stabilne dane podczas debugowania
-    //Serial.print(cmd.speed); 
-    //Serial.println(cmd.steer);
+
+uint8_t id = 2;
+  // Inne dostępne metody sterowania (używaj tylko jednej na raz!):
+   Vesc.setDuty(0.2);       // Sterowanie wypełnieniem (0.2 = 20% napięcia)
+   Vesc.setDuty(0.2, id);       // Sterowanie wypełnieniem (0.2 = 20% napięcia)
+  // Vesc.setRPM(1500);       // Sterowanie prędkością (w ERPM)
+  // Vesc.setBrakeCurrent(5); // Hamowanie prądem 5A
+
+  delay(20); // Krótka przerwa, optymalna częstotliwość pętli to 20-50Hz
+
+  // 2. ODBIERANIE TELEMETRII (DANYCH Z VESC)
+  // Funkcja getVescValues() pyta VESC o aktualne parametry i zwraca true, jeśli odpowiedź dotarła
+  if ( Vesc.getVescValues() ) {
+    Serial.println("--- DANE Z VESC ---");
+    
+    // Obroty elektryczne (ERPM)
+    Serial.print("Prędkość (ERPM): ");
+    Serial.println(Vesc.data.rpm);
+    
+    // Aktualne napięcie na baterii
+    Serial.print("Napięcie zasilania: ");
+    Serial.print(Vesc.data.inpVoltage);
+    Serial.println(" V");
+    
+    // Prąd pobierany z akumulatora
+    Serial.print("Prąd z baterii: ");
+    Serial.print(Vesc.data.avgInputCurrent);
+    Serial.println(" A");
+
+    // Temperatura sterownika
+    Serial.print("Temperatura MOSFETów: ");
+    Serial.print(Vesc.data.tempMosfet);
+    Serial.println(" C");
+  } else {
+    Serial.println("Błąd komunikacji! Sprawdź przewody UART.");
   }
 
-  
-  hoverDriver.move(com);
-  //Serial.println("Test move forward");
-
-  //delay(1); // daje czas schedulerowi/USB/WiFi
-  
+  delay(200); // Pobieraj dane rzadziej, np. co 200ms, żeby nie zapychać portu szeregowego
 }
