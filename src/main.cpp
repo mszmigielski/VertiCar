@@ -1,58 +1,66 @@
 #include "VescUart.h"
+#include <Arduino.h>
+#include "config.h"
+#include "GlobalTypes.h"
+#include "WifiController.h"
 
 // Tworzymy obiekt obsługujący VESC
 VescUart Vesc;
+WifiController wifiController;
+unsigned long previousMillis = 0;
+
+void move(SpeedCommand s_cmd) {
+    uint8_t id = 2;
+  VescCommand cmd = {
+    .dutyL = (s_cmd.speed + s_cmd.steer)*(float)MAX_SPEED, // Lewa strona: prędkość + skręt
+    .dutyR = (s_cmd.speed - s_cmd.steer)*(float)MAX_SPEED  // Prawa strona: prędkość - skręt
+    };
+   Vesc.setDuty(cmd.dutyL);       
+   Vesc.setDuty(cmd.dutyR, id);  
+   if (previousMillis - millis() >= 500) { // Wyświetlaj komendę co 500ms, żeby nie zapychać portu szeregowego
+        previousMillis = millis();
+   Serial.print("Wysłano komendę: DutyL = "); Serial.print(cmd.dutyL); Serial.print(" | DutyR = "); Serial.println(cmd.dutyR);
+   }
+
+}
+
 
 void setup() {
   // Port Serial0 (USB) do podglądu danych na komputerze (Monitor Portu Szeregowego)
-  Serial.begin(9600);
-  while (!Serial) { ; } // Czekaj na otwarcie monitora
+   Serial.begin(115200);
+ // while (!Serial) { delay(10); }
+  Serial.println("Uruchamianie VertiCar...");
+
+  wifiController.initAP(WIFI_SSID, WIFI_PASSWORD);
+  Serial.println("Punkt dostępowy WiFi uruchomiony.");
 
   // Port Serial2 do komunikacji z VESC (dla ESP32 piny RX=16, TX=17, dla Mega piny RX=17, TX=16)
   // Jeśli używasz Arduino Mega, wpisz po prostu: Serial2.begin(115200);
-  Serial2.begin(115200, SERIAL_8N1, 16, 17); 
+  Serial2.begin(115200, SERIAL_8N1, 40, 39); 
 
   // Powiązanie biblioteki z fizycznym portem Serial2
   Vesc.setSerialPort(&Serial2);
+  previousMillis = millis();
 }
 
 void loop() {
 
-uint8_t id = 2;
-  // Inne dostępne metody sterowania (używaj tylko jednej na raz!):
-   Vesc.setDuty(0.2);       // Sterowanie wypełnieniem (0.2 = 20% napięcia)
-   Vesc.setDuty(0.2, id);       // Sterowanie wypełnieniem (0.2 = 20% napięcia)
-  // Vesc.setRPM(1500);       // Sterowanie prędkością (w ERPM)
-  // Vesc.setBrakeCurrent(5); // Hamowanie prądem 5A
+  wifiController.loop(); // Obsługa WiFi i WebSocketów
+  SpeedCommand s_cmd = wifiController.getCommand(); // Pobierz aktualne polecenie prędkości i skrętu
+  //Serial.print(s_cmd.speed); Serial.print(" | "); Serial.println(s_cmd.steer); // Debug: wyświetl otrzymane polecenie
+  move(s_cmd); // Wyślij polecenie do VESC
+       
 
-  delay(20); // Krótka przerwa, optymalna częstotliwość pętli to 20-50Hz
 
-  // 2. ODBIERANIE TELEMETRII (DANYCH Z VESC)
-  // Funkcja getVescValues() pyta VESC o aktualne parametry i zwraca true, jeśli odpowiedź dotarła
+/*
   if ( Vesc.getVescValues() ) {
-    Serial.println("--- DANE Z VESC ---");
-    
     // Obroty elektryczne (ERPM)
     Serial.print("Prędkość (ERPM): ");
     Serial.println(Vesc.data.rpm);
     
-    // Aktualne napięcie na baterii
-    Serial.print("Napięcie zasilania: ");
-    Serial.print(Vesc.data.inpVoltage);
-    Serial.println(" V");
-    
-    // Prąd pobierany z akumulatora
-    Serial.print("Prąd z baterii: ");
-    Serial.print(Vesc.data.avgInputCurrent);
-    Serial.println(" A");
-
-    // Temperatura sterownika
-    Serial.print("Temperatura MOSFETów: ");
-    Serial.print(Vesc.data.tempMosfet);
-    Serial.println(" C");
   } else {
-    Serial.println("Błąd komunikacji! Sprawdź przewody UART.");
+    //Serial.println("Błąd komunikacji! Sprawdź przewody UART.");
   }
-
-  delay(200); // Pobieraj dane rzadziej, np. co 200ms, żeby nie zapychać portu szeregowego
+*/
+  //delay(200); // Pobieraj dane rzadziej, np. co 200ms, żeby nie zapychać portu szeregowego
 }

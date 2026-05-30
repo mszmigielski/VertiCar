@@ -27,3 +27,4 @@ This is a presonal portfolio projekt where the goal is to gain knowledge and exp
 ### To Do:
 - controller input sequence after lost server
 - check the connection to server
+- adjust motor driver disconneted timeout

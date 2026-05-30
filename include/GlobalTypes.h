@@ -7,6 +7,11 @@ typedef struct{
     float steer;
 } SpeedCommand;
 
+typedef struct{
+   float dutyL;
+   float dutyR;
+} VescCommand;
+
 typedef struct {
    uint16_t start;
    int16_t  steer;

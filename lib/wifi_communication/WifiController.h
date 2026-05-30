@@ -17,8 +17,9 @@ private:
      unsigned long _lastPacketTime = 0; // Czas ostatniego odebranego pakietu
 
     void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length);
-    public:
-    // Getter zwracający stałą referencję (szybko i bezpiecznie!)
+
+public:
+    
     const SpeedCommand& getCommand() const { 
         return _currentCommand; 
     }
