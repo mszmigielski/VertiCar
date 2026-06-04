@@ -3,10 +3,13 @@
 #include "config.h"
 #include "GlobalTypes.h"
 #include "WifiController.h"
-
+#include "MPU9250.h"
+#include <Wire.h>
 // Tworzymy obiekt obsługujący VESC
 VescUart Vesc;
 WifiController wifiController;
+MPU9250 mpu;
+
 unsigned long previousMillis = 0;
 
 void move(SpeedCommand s_cmd) {
@@ -15,15 +18,50 @@ void move(SpeedCommand s_cmd) {
     .dutyL = (s_cmd.speed + s_cmd.steer)*(float)MAX_SPEED, // Lewa strona: prędkość + skręt
     .dutyR = (s_cmd.speed - s_cmd.steer)*(float)MAX_SPEED  // Prawa strona: prędkość - skręt
     };
-   Vesc.setDuty(cmd.dutyL);       
-   Vesc.setDuty(cmd.dutyR, id);  
-   if (previousMillis - millis() >= 500) { // Wyświetlaj komendę co 500ms, żeby nie zapychać portu szeregowego
-        previousMillis = millis();
-   Serial.print("Wysłano komendę: DutyL = "); Serial.print(cmd.dutyL); Serial.print(" | DutyR = "); Serial.println(cmd.dutyR);
-   }
+   Vesc.setDuty(cmd.dutyR);       
+   Vesc.setDuty(cmd.dutyL, id);  
 
 }
+void print_roll_pitch_yaw() {
+    Serial.print("Yaw, Pitch, Roll: ");
+    Serial.print(mpu.getYaw(), 2);
+    Serial.print(", ");
+    Serial.print(mpu.getPitch(), 2);
+    Serial.print(", ");
+    Serial.println(mpu.getRoll(), 2);
+}
 
+void print_calibration() {
+    Serial.println("< calibration parameters >");
+    Serial.println("accel bias [g]: ");
+    Serial.print(mpu.getAccBiasX() * 1000.f / (float)MPU9250::CALIB_ACCEL_SENSITIVITY);
+    Serial.print(", ");
+    Serial.print(mpu.getAccBiasY() * 1000.f / (float)MPU9250::CALIB_ACCEL_SENSITIVITY);
+    Serial.print(", ");
+    Serial.print(mpu.getAccBiasZ() * 1000.f / (float)MPU9250::CALIB_ACCEL_SENSITIVITY);
+    Serial.println();
+    Serial.println("gyro bias [deg/s]: ");
+    Serial.print(mpu.getGyroBiasX() / (float)MPU9250::CALIB_GYRO_SENSITIVITY);
+    Serial.print(", ");
+    Serial.print(mpu.getGyroBiasY() / (float)MPU9250::CALIB_GYRO_SENSITIVITY);
+    Serial.print(", ");
+    Serial.print(mpu.getGyroBiasZ() / (float)MPU9250::CALIB_GYRO_SENSITIVITY);
+    Serial.println();
+    Serial.println("mag bias [mG]: ");
+    Serial.print(mpu.getMagBiasX());
+    Serial.print(", ");
+    Serial.print(mpu.getMagBiasY());
+    Serial.print(", ");
+    Serial.print(mpu.getMagBiasZ());
+    Serial.println();
+    Serial.println("mag scale []: ");
+    Serial.print(mpu.getMagScaleX());
+    Serial.print(", ");
+    Serial.print(mpu.getMagScaleY());
+    Serial.print(", ");
+    Serial.print(mpu.getMagScaleZ());
+    Serial.println();
+}
 
 void setup() {
   // Port Serial0 (USB) do podglądu danych na komputerze (Monitor Portu Szeregowego)
@@ -41,6 +79,32 @@ void setup() {
   // Powiązanie biblioteki z fizycznym portem Serial2
   Vesc.setSerialPort(&Serial2);
   previousMillis = millis();
+
+  // Inicjalizacja imu
+  Wire.begin(IMU_SDA_PIN, IMU_SCL_PIN);
+  delay(1000);
+  if (!mpu.setup(0x68)) {  // change to your own address
+        while (1) {
+            Serial.println("MPU connection failed. Please check your connection with `connection_check` example.");
+            delay(5000);
+        }
+    }
+/*
+    Serial.println("Accel Gyro calibration will start in 5sec.");
+    Serial.println("Please leave the device still on the flat plane.");
+    mpu.verbose(true);
+    delay(5000);
+    mpu.calibrateAccelGyro();
+
+    Serial.println("Mag calibration will start in 5sec.");
+    Serial.println("Please Wave device in a figure eight until done.");
+    delay(5000);
+    mpu.calibrateMag();
+
+    print_calibration();
+    mpu.verbose(false);
+    delay(5000);
+    */
 }
 
 void loop() {
@@ -50,17 +114,12 @@ void loop() {
   //Serial.print(s_cmd.speed); Serial.print(" | "); Serial.println(s_cmd.steer); // Debug: wyświetl otrzymane polecenie
   move(s_cmd); // Wyślij polecenie do VESC
        
+if (mpu.update()) {
+        static uint32_t prev_ms = millis();
+        if (millis() > prev_ms + 25) {
+            print_roll_pitch_yaw();
+            prev_ms = millis();
+        }
+    }
 
-
-/*
-  if ( Vesc.getVescValues() ) {
-    // Obroty elektryczne (ERPM)
-    Serial.print("Prędkość (ERPM): ");
-    Serial.println(Vesc.data.rpm);
-    
-  } else {
-    //Serial.println("Błąd komunikacji! Sprawdź przewody UART.");
-  }
-*/
-  //delay(200); // Pobieraj dane rzadziej, np. co 200ms, żeby nie zapychać portu szeregowego
 }

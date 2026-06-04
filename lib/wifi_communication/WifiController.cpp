@@ -52,6 +52,12 @@ void WifiController::onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payl
         break;
         case WStype_TEXT:
         _lastPacketTime = millis(); // Aktualizuj czas ostatniego pakietu
+        
+        // Odbicie ping
+        if (length == 4 && memcmp(payload, "ping", 4) == 0) {
+                _webSocket.sendTXT(num, "pong");
+                break; 
+            }
 
         JsonDocument doc;
         DeserializationError error = deserializeJson(doc, payload, length);
