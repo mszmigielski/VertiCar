@@ -2,24 +2,21 @@
 #include <Arduino.h>
 
 // Val [-1, 1]
-typedef struct{
+struct SpeedCommand {
     float speed;
     float steer;
-} SpeedCommand;
+};
 
-typedef struct{
-   float dutyL;
-   float dutyR;
-} VescCommand;
 
-typedef struct {
+
+struct {
    uint16_t start;
    int16_t  steer;
    int16_t  speed;
    uint16_t checksum;
 } __attribute__((packed)) SerialCommand;
 
-typedef struct {
+ struct {
    uint16_t start;
    int16_t  cmd1;
    int16_t  cmd2;

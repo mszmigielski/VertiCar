@@ -5,23 +5,16 @@
 #include "WifiController.h"
 #include "MPU9250.h"
 #include <Wire.h>
+#include "VescDriver.h"
 // Tworzymy obiekt obsługujący VESC
 VescUart Vesc;
+VescDriver vescDriver(Serial2);
 WifiController wifiController;
 MPU9250 mpu;
 
 unsigned long previousMillis = 0;
 
-void move(SpeedCommand s_cmd) {
-    uint8_t id = 2;
-  VescCommand cmd = {
-    .dutyL = (s_cmd.speed + s_cmd.steer)*(float)MAX_SPEED, // Lewa strona: prędkość + skręt
-    .dutyR = (s_cmd.speed - s_cmd.steer)*(float)MAX_SPEED  // Prawa strona: prędkość - skręt
-    };
-   Vesc.setDuty(cmd.dutyR);       
-   Vesc.setDuty(cmd.dutyL, id);  
 
-}
 void print_roll_pitch_yaw() {
     Serial.print("Yaw, Pitch, Roll: ");
     Serial.print(mpu.getYaw(), 2);
@@ -77,7 +70,7 @@ void setup() {
   Serial2.begin(115200, SERIAL_8N1, 40, 39); 
 
   // Powiązanie biblioteki z fizycznym portem Serial2
-  Vesc.setSerialPort(&Serial2);
+  
   previousMillis = millis();
 
   // Inicjalizacja imu
@@ -112,7 +105,7 @@ void loop() {
   wifiController.loop(); // Obsługa WiFi i WebSocketów
   SpeedCommand s_cmd = wifiController.getCommand(); // Pobierz aktualne polecenie prędkości i skrętu
   //Serial.print(s_cmd.speed); Serial.print(" | "); Serial.println(s_cmd.steer); // Debug: wyświetl otrzymane polecenie
-  move(s_cmd); // Wyślij polecenie do VESC
+  vescDriver.move(s_cmd); // Wyślij polecenie do VESC
        
 if (mpu.update()) {
         static uint32_t prev_ms = millis();
