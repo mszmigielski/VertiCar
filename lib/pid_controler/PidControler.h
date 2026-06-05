@@ -1,6 +1,6 @@
 #pragma once
-
-class Pidcontroler {
+#include <Arduino.h>
+class PidControler {
 private:
     // --- Nastawy regulatora ---
     float _kp;
@@ -20,7 +20,7 @@ private:
 
 public:
     // Konstruktor
-    Pidcontroler(float kp, float ki, float kd, float tau);
+    PidControler(float kp, float ki, float kd, float tau);
 
     // Konfiguracja (można wywoływać w locie)
     void setTunings(float kp, float ki, float kd);

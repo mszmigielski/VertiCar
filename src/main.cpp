@@ -8,6 +8,7 @@
 #include "VescDriver.h"
 #include "Imu.h"
 #include "ControlPanel.h"
+#include "PidControler.h"
 //TODO: uporządkować includy
 
 
@@ -17,7 +18,8 @@ Imu imu(Wire);
 ControlPanel panel(WHITE_BUTTON_PIN, WHITE_BUTTON_LED_PIN);
 unsigned long previousMillis = 0;
 PIDTunings pidTunings;
-
+float tau = 0.03f; // Stała czasowa filtru dla członu D (do dostosowania w zależności od charakterystyki systemu)
+PidControler PID(1,0,0, tau);
 
 
 void setup() {
@@ -60,8 +62,9 @@ void loop() {
   imu.update(); // Aktualizacja danych z IMU
   float pitch = imu.getPitch(); // Przykładowe pobranie kąta pitch (możesz też pobrać yaw i roll)
   wificontroler.sendTelemetry(pitch, 0.0f); // Wyślij dane telemetryczne do przeglądarki
-
-
-  pidTunings = wificontroler.getPidTunings(); // Pobierz aktualne nastawy PID
-  Serial.print(pidTunings.kp); Serial.print(" Ki="); Serial.print(pidTunings.ki); Serial.print(" Kd="); Serial.println(pidTunings.kd);
+  float dt = (millis() - previousMillis) / 1000.0f; // Oblicz czas od ostatniej aktualizacji w sekundach
+  previousMillis = millis(); // Zaktualizuj czas poprzedniej aktualizacji
+  PID.update(0, pitch, dt);
+ 
+  
 }

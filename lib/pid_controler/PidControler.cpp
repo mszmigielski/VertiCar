@@ -1,7 +1,7 @@
 #include "Pidcontroler.h"
 
 // Konstruktor - inicjalizuje zmienne i wgrywa ustawienia początkowe
-Pidcontroler::Pidcontroler(float kp, float ki, float kd, float tau) {
+PidControler::PidControler(float kp, float ki, float kd, float tau) {
     _kp = kp;
     _ki = ki;
     _kd = kd;
@@ -15,20 +15,20 @@ Pidcontroler::Pidcontroler(float kp, float ki, float kd, float tau) {
 }
 
 // Zmiana nastaw w locie (np. z menu OLED lub przez Wi-Fi)
-void Pidcontroler::setTunings(float kp, float ki, float kd) {
+void PidControler::setTunings(float kp, float ki, float kd) {
     _kp = kp;
     _ki = ki;
     _kd = kd;
 }
 
 // Ustawienie fizycznych limitów urządzenia wykonawczego
-void Pidcontroler::setLimits(float min, float max) {
+void PidControler::setLimits(float min, float max) {
     _outMin = min;
     _outMax = max;
 }
 
 // Pełny reset pamięci regulatora
-void Pidcontroler::reset() {
+void PidControler::reset() {
     _integralSum = 0.0f;
     _prevMeasurement = 0.0f;
     _prevDerivative = 0.0f;
@@ -36,7 +36,7 @@ void Pidcontroler::reset() {
 }
 
 // GŁÓWNA LOGIKA REGULATORA
-float Pidcontroler::update(float setpoint, float measurement, float dt) {
+float PidControler::update(float setpoint, float measurement, float dt) {
     // Zabezpieczenie przed dzieleniem przez zero w przypadku błędu czasu
     if (dt <= 0.0f) {
         return 0.0f; 
@@ -59,10 +59,11 @@ float Pidcontroler::update(float setpoint, float measurement, float dt) {
     // Różniczkujemy po POMIARZE, nie po błędzie (Derivative on Measurement)
     float deltaMeasurement = measurement - _prevMeasurement;
     float rawDerivative = -(deltaMeasurement / dt);
+     Serial.print(rawDerivative);//---------------------------------------------------------
     
     // Aplikacja filtru LPF do wygładzenia szumu z czujnika IMU
     float D = _prevDerivative + (dt / (_tau + dt)) * (rawDerivative - _prevDerivative);
-
+    Serial.print("\t"); Serial.println(D); //-------------------------------------------------------------
     // 4. Człon Całkujący (I) - krok narastania
     float I_step = _ki * error * dt;
 
