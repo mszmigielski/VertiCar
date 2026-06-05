@@ -90,3 +90,15 @@ void WifiController::loop() {
         _currentCommand = {0, 0}; // Resetuj komendę do bezpiecznej wartości
     }
 }
+
+
+void WifiController::sendTelemetry(float angle) {
+    static unsigned long lastTime = 0;
+    if (millis() - lastTime < 100) { // Limituj wysyłanie danych telemetrycznych do co 100 ms
+        return;
+    }
+    char buffer[64];
+    snprintf(buffer, sizeof(buffer), "{\"t\":\"tele\",\"ang\":%.2f}", angle);
+
+    _webSocket.broadcastTXT(buffer);
+}

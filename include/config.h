@@ -17,3 +17,7 @@
 #define MPU9250_ADDRESS 0x68
 #define IMU_SDA_PIN 4
 #define IMU_SCL_PIN 5
+
+// Interface box
+#define WHITE_BUTTON_PIN 7
+#define WHITE_BUTTON_LED_PIN 6

@@ -7,13 +7,14 @@
 #include <Wire.h>
 #include "VescDriver.h"
 #include "Imu.h"
+#include "ControlPanel.h"
 //TODO: uporządkować includy
 
 
 VescDriver vescDriver(Serial2);
 WifiController wifiController;
 Imu imu(Wire);
-
+ControlPanel panel(WHITE_BUTTON_PIN, WHITE_BUTTON_LED_PIN);
 unsigned long previousMillis = 0;
 
 
@@ -46,16 +47,18 @@ void setup() {
         }
     }
 
+
+  panel.init();
 }
 
 void loop() {
-
+  panel.update(); // Update the control panel state
   wifiController.loop(); // Obsługa WiFi i WebSocketów
   SpeedCommand s_cmd = wifiController.getCommand(); // Pobierz aktualne polecenie prędkości i skrętu
   vescDriver.move(s_cmd); // Wyślij polecenie do VESC
 
   imu.update(); // Aktualizacja danych z IMU
   float pitch = imu.getPitch(); // Przykładowe pobranie kąta pitch (możesz też pobrać yaw i roll)
-    Serial.print("Pitch: ");
-    Serial.println(pitch);
+  wifiController.sendTelemetry(pitch); // Wyślij dane telemetryczne do przeglądarki
+
 }
