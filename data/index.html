@@ -41,17 +41,18 @@
         <div id="status">Connecting... (Press any key to start)</div>
         
         <div id="network-status">
-            Link: <span id="connSpan" style="color: orange;">Connecting...</span> | 
+            Link: <span id="connSpan" style="color: orange;">Connecting...</span>
             Ping: <span id="pingSpan">---</span> ms
         </div>
 
         <div class="data">X: <span id="valX">0</span> | Y: <span id="valY">0</span></div>
-
+        <div class="data">Pitch: <span id="valPitch">0</span></div>
         <script>
             // Elements
             const statusEl = document.getElementById('status');
             const valXEl = document.getElementById('valX');
             const valYEl = document.getElementById('valY');
+            const valPitchEl = document.getElementById('valPitch');
             const connSpan = document.getElementById('connSpan');
             const pingSpan = document.getElementById('pingSpan');
 

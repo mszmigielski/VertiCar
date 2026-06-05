@@ -28,6 +28,6 @@ public:
     
     VescUart::dataPackage dataL;
     VescUart::dataPackage dataR;
-
+//TODO: add method to get data from object
 };
 
