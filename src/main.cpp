@@ -62,6 +62,7 @@ void loop() {
   imu.update(); // Aktualizacja danych z IMU
   float pitch = imu.getPitch(); // Przykładowe pobranie kąta pitch (możesz też pobrać yaw i roll)
   wificontroler.sendTelemetry(pitch, 0.0f); // Wyślij dane telemetryczne do przeglądarki
+  
   float dt = (millis() - previousMillis) / 1000.0f; // Oblicz czas od ostatniej aktualizacji w sekundach
   previousMillis = millis(); // Zaktualizuj czas poprzedniej aktualizacji
   PID.update(0, pitch, dt);

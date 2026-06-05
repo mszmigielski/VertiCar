@@ -1,4 +1,4 @@
-#include "Pidcontroler.h"
+#include "PidControler.h"
 
 // Konstruktor - inicjalizuje zmienne i wgrywa ustawienia początkowe
 PidControler::PidControler(float kp, float ki, float kd, float tau) {
@@ -59,11 +59,10 @@ float PidControler::update(float setpoint, float measurement, float dt) {
     // Różniczkujemy po POMIARZE, nie po błędzie (Derivative on Measurement)
     float deltaMeasurement = measurement - _prevMeasurement;
     float rawDerivative = -(deltaMeasurement / dt);
-     Serial.print(rawDerivative);//---------------------------------------------------------
-    
+
     // Aplikacja filtru LPF do wygładzenia szumu z czujnika IMU
     float D = _prevDerivative + (dt / (_tau + dt)) * (rawDerivative - _prevDerivative);
-    Serial.print("\t"); Serial.println(D); //-------------------------------------------------------------
+
     // 4. Człon Całkujący (I) - krok narastania
     float I_step = _ki * error * dt;
 
