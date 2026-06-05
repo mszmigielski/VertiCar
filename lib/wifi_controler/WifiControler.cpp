@@ -2,7 +2,7 @@
 #include "config.h"
 #include "GlobalTypes.h"
 #include <WiFi.h>
-#include "WifiController.h"
+#include "WifiControler.h"
 #include <WebSocketsServer.h>
 #include <ArduinoJson.h>
 #include <LittleFS.h>
@@ -11,7 +11,7 @@
 
 
 
-void WifiController::initAP(const char*ssid, const char* password) {
+void WifiControler::initAP(const char*ssid, const char* password) {
 
     if (!LittleFS.begin(true)) { 
         Serial.println("Błąd montowania systemu plików LittleFS!");
@@ -41,7 +41,7 @@ void WifiController::initAP(const char*ssid, const char* password) {
 
 
 
-void WifiController::onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length){
+void WifiControler::onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length){
     switch(type) {
         case WStype_DISCONNECTED:
         _currentCommand = {0, 0}; // Resetuj komendę, gdy klient się rozłączy
@@ -69,9 +69,17 @@ void WifiController::onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payl
         if (t != nullptr && strcmp(t, "ctrl") == 0) {
             _currentCommand.speed = doc["y"].as<float>();
             _currentCommand.steer = doc["x"].as<float>();
-        } else if (t != nullptr && strcmp(t, "stop") == 0) {
+        } 
+        else if (t != nullptr && strcmp(t, "stop") == 0) {
             _currentCommand.speed = 0;
             _currentCommand.steer = 0;
+        }
+        else if (t != nullptr && strcmp(t, "TUNE_PID") == 0) {
+            _currentPidTunings.kp = doc["p"].as<float>();
+            _currentPidTunings.ki = doc["i"].as<float>();
+            _currentPidTunings.kd = doc["d"].as<float>();
+            // Tutaj możesz dodać kod do aktualizacji nastawów PID w swoim regulatorze
+            
         }
         break;
         
@@ -82,7 +90,7 @@ void WifiController::onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payl
 
 
 
-void WifiController::loop() {
+void WifiControler::loop() {
     _webSocket.loop();
     _httpServer.handleClient();
     //watchdog
@@ -92,13 +100,13 @@ void WifiController::loop() {
 }
 
 
-void WifiController::sendTelemetry(float angle) {
+void WifiControler::sendTelemetry(float angle, float current) {
     static unsigned long lastTime = 0;
     if (millis() - lastTime < 100) { // Limituj wysyłanie danych telemetrycznych do co 100 ms
         return;
     }
     char buffer[64];
-    snprintf(buffer, sizeof(buffer), "{\"t\":\"tele\",\"ang\":%.2f}", angle);
+    snprintf(buffer, sizeof(buffer), "{\"t\":\"tele\",\"ang\":%.2f,\"curr\":%.2f}", angle, current);
 
     _webSocket.broadcastTXT(buffer);
 }

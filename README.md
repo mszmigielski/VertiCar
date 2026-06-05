@@ -21,6 +21,6 @@ This is a presonal portfolio projekt where the goal is to gain knowledge and exp
 ### Using vesc drivers
 
 ### To Do:
-- controller input sequence after lost server
+- controler input sequence after lost server
 - check the connection to server
 - adjust motor driver disconneted timeout

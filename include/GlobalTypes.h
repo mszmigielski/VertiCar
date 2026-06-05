@@ -7,7 +7,11 @@ struct SpeedCommand {
     float steer;
 };
 
-
+struct PIDTunings {
+    float kp;
+    float ki;
+    float kd;
+};
 
 struct {
    uint16_t start;

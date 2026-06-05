@@ -1,7 +1,7 @@
-#include "PidController.h"
+#include "Pidcontroler.h"
 
 // Konstruktor - inicjalizuje zmienne i wgrywa ustawienia początkowe
-PidController::PidController(float kp, float ki, float kd, float tau) {
+Pidcontroler::Pidcontroler(float kp, float ki, float kd, float tau) {
     _kp = kp;
     _ki = ki;
     _kd = kd;
@@ -15,20 +15,20 @@ PidController::PidController(float kp, float ki, float kd, float tau) {
 }
 
 // Zmiana nastaw w locie (np. z menu OLED lub przez Wi-Fi)
-void PidController::setTunings(float kp, float ki, float kd) {
+void Pidcontroler::setTunings(float kp, float ki, float kd) {
     _kp = kp;
     _ki = ki;
     _kd = kd;
 }
 
 // Ustawienie fizycznych limitów urządzenia wykonawczego
-void PidController::setLimits(float min, float max) {
+void Pidcontroler::setLimits(float min, float max) {
     _outMin = min;
     _outMax = max;
 }
 
 // Pełny reset pamięci regulatora
-void PidController::reset() {
+void Pidcontroler::reset() {
     _integralSum = 0.0f;
     _prevMeasurement = 0.0f;
     _prevDerivative = 0.0f;
@@ -36,7 +36,7 @@ void PidController::reset() {
 }
 
 // GŁÓWNA LOGIKA REGULATORA
-float PidController::update(float setpoint, float measurement, float dt) {
+float Pidcontroler::update(float setpoint, float measurement, float dt) {
     // Zabezpieczenie przed dzieleniem przez zero w przypadku błędu czasu
     if (dt <= 0.0f) {
         return 0.0f; 

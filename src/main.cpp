@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "config.h"
 #include "GlobalTypes.h"
-#include "WifiController.h"
+#include "WifiControler.h"
 #include "MPU9250.h"
 #include <Wire.h>
 #include "VescDriver.h"
@@ -12,11 +12,11 @@
 
 
 VescDriver vescDriver(Serial2);
-WifiController wifiController;
+WifiControler wificontroler;
 Imu imu(Wire);
 ControlPanel panel(WHITE_BUTTON_PIN, WHITE_BUTTON_LED_PIN);
 unsigned long previousMillis = 0;
-
+PIDTunings pidTunings;
 
 
 
@@ -26,7 +26,7 @@ void setup() {
  // while (!Serial) { delay(10); }
   Serial.println("Uruchamianie VertiCar...");
 
-  wifiController.initAP(WIFI_SSID, WIFI_PASSWORD);
+  wificontroler.initAP(WIFI_SSID, WIFI_PASSWORD);
   Serial.println("Punkt dostępowy WiFi uruchomiony.");
 
   // Port Serial2 do komunikacji z VESC (dla ESP32 piny RX=16, TX=17, dla Mega piny RX=17, TX=16)
@@ -53,12 +53,15 @@ void setup() {
 
 void loop() {
   panel.update(); // Update the control panel state
-  wifiController.loop(); // Obsługa WiFi i WebSocketów
-  SpeedCommand s_cmd = wifiController.getCommand(); // Pobierz aktualne polecenie prędkości i skrętu
+  wificontroler.loop(); // Obsługa WiFi i WebSocketów
+  SpeedCommand s_cmd = wificontroler.getCommand(); // Pobierz aktualne polecenie prędkości i skrętu
   vescDriver.move(s_cmd); // Wyślij polecenie do VESC
 
   imu.update(); // Aktualizacja danych z IMU
   float pitch = imu.getPitch(); // Przykładowe pobranie kąta pitch (możesz też pobrać yaw i roll)
-  wifiController.sendTelemetry(pitch); // Wyślij dane telemetryczne do przeglądarki
+  wificontroler.sendTelemetry(pitch, 0.0f); // Wyślij dane telemetryczne do przeglądarki
 
+
+  pidTunings = wificontroler.getPidTunings(); // Pobierz aktualne nastawy PID
+  Serial.print(pidTunings.kp); Serial.print(" Ki="); Serial.print(pidTunings.ki); Serial.print(" Kd="); Serial.println(pidTunings.kd);
 }

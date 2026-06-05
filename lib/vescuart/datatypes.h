@@ -109,7 +109,7 @@ typedef enum {
 	MOTOR_TYPE_GPD
 } mc_motor_type;
 
-// FOC current controller decoupling mode.
+// FOC current controler decoupling mode.
 typedef enum {
 	FOC_CC_DECOUPLING_DISABLED = 0,
 	FOC_CC_DECOUPLING_CROSS,
@@ -434,7 +434,7 @@ typedef struct {
 	float p_pid_gain_dec_angle;
 	float p_pid_offset;
 
-	// Current controller
+	// Current controler
 	float cc_startup_boost_duty;
 	float cc_min_current;
 	float cc_gain;
@@ -838,7 +838,7 @@ typedef enum {
 
 typedef struct {
 	// Settings
-	uint8_t controller_id;
+	uint8_t controler_id;
 	uint32_t timeout_msec;
 	float timeout_brake_current;
 	uint32_t can_status_rate_1;
