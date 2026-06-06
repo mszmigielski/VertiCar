@@ -147,15 +147,17 @@
                     
                     let x = gp.axes[0]; // Left stick X-axis
                     let y = gp.axes[1] * (-1); // Left stick Y-axis
-                    
+                    let buttonPressed = gp.buttons[0].pressed ? 1 : 0;
+
                     if (Math.abs(x) < 0.1) x = 0; // Deadzone
                     if (Math.abs(y) < 0.1) y = 0; // Deadzone
-
+                    
+                    
                     valXEl.innerText = x.toFixed(2); // Zaokrąglenie dla czytelności
                     valYEl.innerText = y.toFixed(2);
                     
                     if (ws.readyState === WebSocket.OPEN) {
-                        const msg = JSON.stringify({t: "ctrl", x: x, y: y});
+                        const msg = JSON.stringify({t: "ctrl", x: x, y: y, b: buttonPressed});
                         ws.send(msg);
                     }
                 } else {

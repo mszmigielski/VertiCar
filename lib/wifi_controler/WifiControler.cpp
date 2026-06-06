@@ -44,7 +44,8 @@ void WifiControler::initAP(const char*ssid, const char* password) {
 void WifiControler::onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length){
     switch(type) {
         case WStype_DISCONNECTED:
-        _currentCommand = {0, 0}; // Resetuj komendę, gdy klient się rozłączy
+        _currentCommand = {0, 0};
+        _button0 = 0; // Resetuj komendę, gdy klient się rozłączy
         break;
         case WStype_CONNECTED:
         // to do: dodać intykador w postaci diody
@@ -69,10 +70,12 @@ void WifiControler::onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * paylo
         if (t != nullptr && strcmp(t, "ctrl") == 0) {
             _currentCommand.speed = doc["y"].as<float>();
             _currentCommand.steer = doc["x"].as<float>();
+            _button0 = doc["b"].as<int>();
         } 
         else if (t != nullptr && strcmp(t, "stop") == 0) {
             _currentCommand.speed = 0;
             _currentCommand.steer = 0;
+            _button0 = 0;
         }
         else if (t != nullptr && strcmp(t, "TUNE_PID") == 0) {
             _currentPidTunings.kp = doc["p"].as<float>();
@@ -96,6 +99,7 @@ void WifiControler::loop() {
     //watchdog
     if (millis() - _lastPacketTime > 500) { // Jeśli minęło więcej niż 500 ms od ostatniego pakietu
         _currentCommand = {0, 0}; // Resetuj komendę do bezpiecznej wartości
+        _button0 = 0;
     }
 }
 

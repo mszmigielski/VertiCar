@@ -67,8 +67,8 @@ void loop() {
   float dt = (millis() - previousMillis) / 1000.0f; // Oblicz czas od ostatniej aktualizacji w sekundach
   previousMillis = millis();
   s_cmd.speed = PID.update(angle, pitch, dt);
-
-  if(panel.isWhiteButtonPressed()){
+  
+  if(!panel.isWhiteButtonPressed() && wificontroler.getButton0() == 1 && abs(pitch) < 15.0f) { // Jeśli przycisk jest wciśnięty, zmień stan
     vescDriver.setCurrent(s_cmd); // Wyślij polecenie do VESC
     //Serial.println(s_cmd.speed);
    
@@ -79,11 +79,12 @@ void loop() {
     //vescDriver.setBrakeCurrent(5.0f);
     PID.reset();// Zatrzymaj silniki, jeśli przycisk nie jest wciśnięty
   }
-
+//Serial.println(wificontroler.getButton0());
   if (millis() - timer > 50){
         state = vescDriver.update(); // Update VESC state (read data, etc.)
     wificontroler.sendTelemetry(pitch, current, (int)(dt * 1000)); // Wyślij dane telemetryczne do przeglądarki
     timer = millis();
+    
     
   }
   

@@ -11,7 +11,8 @@
 class WifiControler {
 private:
     // Tutaj przechowujemy najświeższe dane odebrane z przeglądarki
-    SpeedCommand _currentCommand = {0, 0}; // Domyślnie 0 prędkości i 0 skrętu
+    SpeedCommand _currentCommand = {0, 0};
+    int _button0 = 0; // Domyślnie 0 prędkości i 0 skrętu
     PIDTunings _currentPidTunings = {0, 0, 0}; // Domyślne nastawy PID (do uzupełnienia)
     WebSocketsServer _webSocket{81}; 
     WebServer _httpServer{80};
@@ -28,7 +29,10 @@ public:
     const PIDTunings& getPidTunings() const {
         return _currentPidTunings;
     }
-
+    int getButton0() const {
+        return _button0;
+    }
+    
     void initAP(const char* ssid, const char* password);
     void loop();
     void sendTelemetry(float angle, float current, int loopTime);

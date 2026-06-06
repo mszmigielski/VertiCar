@@ -4,7 +4,7 @@
 // Val [-1, 1]
 struct SpeedCommand {
     float speed;
-    float steer;
+    float steer; // Przykładowe pole dla przycisku (0 lub 1)
 };
 
 struct PIDTunings {
