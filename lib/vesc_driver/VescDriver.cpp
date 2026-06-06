@@ -21,12 +21,16 @@ void VescDriver::setCurrent(SpeedCommand& cmd) {
     CommandCurrent.currentR = (cmd.speed - cmd.steer)*(float)MAX_CURRENT; // Prawa strona: prędkość - skręt
     if(abs(dataL.dutyCycleNow) > maxOnCurrentDuty){
         CommandCurrent.currentL = 0; 
+        Serial.println("L bound");
+        Vesc.setCurrent(CommandCurrent.currentL, 2);
     } else {
         Vesc.setCurrent(CommandCurrent.currentL, 2);
     }
 
     if(abs(dataR.dutyCycleNow) > maxOnCurrentDuty){
         CommandCurrent.currentR = 0; 
+        Serial.println("R bound");
+        Vesc.setCurrent(CommandCurrent.currentR);
     } else {
         Vesc.setCurrent(CommandCurrent.currentR);
     }

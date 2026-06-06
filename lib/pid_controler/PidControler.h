@@ -9,8 +9,8 @@ private:
     
     // --- Parametry filtru i limity ---
     float _tau;     // Stała czasowa filtru dolnoprzepustowego dla członu D
-    float _outMin;  // Minimalne wyjście (np. -1.0 dla VESC)
-    float _outMax;  // Maksymalne wyjście (np. 1.0 dla VESC)
+    float _outMin = -1.0f;  // Minimalne wyjście (np. -1.0 dla VESC)
+    float _outMax = 1.0f;  // Maksymalne wyjście (np. 1.0 dla VESC)
 
     // --- Pamięć stanów wewnętrznych (Memory) ---
     float _integralSum;      // Skumulowana suma członu I

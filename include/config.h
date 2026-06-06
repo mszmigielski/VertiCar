@@ -4,7 +4,9 @@
 
 #define MAX_DUTY           0.2 // Maksymalna prędkość (dostosuj do potrzeb)
 #define MAX_CURRENT        5.0 // Maksymalny prąd (dostosuj do potrzeb)
-#define MAX_ON_CURRENT_DUTY           0.3 // Maksymalne obroty silnika (dostosuj do potrzeb)  
+#define MAX_ON_CURRENT_DUTY           0.4 // Maksymalne obroty silnika (dostosuj do potrzeb)  
+
+#define EQULIBIRUM_ANGLE 4.5
 // Konfiguracja dla WiFi
 #define WIFI_SSID "VertiCar_AP"
 #define WIFI_PASSWORD "verticar123"
