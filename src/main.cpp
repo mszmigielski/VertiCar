@@ -71,9 +71,7 @@ void loop() {
     state = vescDriver.update(); // Update VESC state (read data, etc.)
     wificontroler.sendTelemetry(pitch, current, (int)(dt * 1000)); // Wyślij dane telemetryczne do przeglądarki
     timer = millis();
-    Serial.print(vescDriver.dataR.dutyCycleNow);
-    Serial.print(",");
-    Serial.println(vescDriver.dataL.dutyCycleNow);
+    
   }
   
 }
