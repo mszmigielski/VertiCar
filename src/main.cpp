@@ -18,7 +18,7 @@ Imu imu(Wire);
 ControlPanel panel(WHITE_BUTTON_PIN, WHITE_BUTTON_LED_PIN);
 unsigned long previousMillis = 0;
 PIDTunings pidTunings;
-float tau = 0.03f; // Stała czasowa filtru dla członu D (do dostosowania w zależności od charakterystyki systemu)
+float tau = 0.08f; // Stała czasowa filtru dla członu D (do dostosowania w zależności od charakterystyki systemu)
 PidControler PID(0.2f,0,0, tau);
 unsigned long timer = millis();
 float angle = EQULIBIRUM_ANGLE;
@@ -58,7 +58,8 @@ void setup() {
 void loop() {
   panel.update(); // Update the control panel state
   static bool state = false; // Przykładowy stan, który można kontrolować przyciskiem
-  
+  PIDTunings nastawy = wificontroler.getPidTunings();
+  PID.setTunings(nastawy.kp, nastawy.ki, nastawy.kd);
   wificontroler.loop(); // Obsługa WiFi i WebSocketów
   imu.update(); // Aktualizacja danych z IMU
   float pitch = imu.getPitch(); // Przykładowe pobranie kąta pitch (możesz też pobrać yaw i roll)
@@ -69,12 +70,12 @@ void loop() {
 
   if(panel.isWhiteButtonPressed()){
     vescDriver.setCurrent(s_cmd); // Wyślij polecenie do VESC
-    Serial.println(s_cmd.speed);
+    //Serial.println(s_cmd.speed);
    
   } else {
     SpeedCommand stopCmd = {0.0f, 0.0f};
     vescDriver.setCurrent(stopCmd);
-    Serial.println("Zatrzymano silniki");
+    //Serial.println("Zatrzymano silniki");
     //vescDriver.setBrakeCurrent(5.0f);
     PID.reset();// Zatrzymaj silniki, jeśli przycisk nie jest wciśnięty
   }
