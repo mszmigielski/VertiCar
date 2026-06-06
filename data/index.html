@@ -49,6 +49,7 @@
         <div class="telemetry-box">
             <p>Kąt: <span id="valAngle">0.00</span>&deg;</p>
             <p>Prąd silników: <span id="valCurrent">0.00</span> A</p>
+            <p>Czas pętli: <span id="valLoopTime">0</span> ms</p>
         </div>
 
         <hr>
@@ -112,6 +113,7 @@
                         if (data.t === "tele") {
                             document.getElementById('valAngle').innerText = data.ang.toFixed(2);
                             document.getElementById('valCurrent').innerText = data.curr.toFixed(2);
+                            document.getElementById('valLoopTime').innerText = data.loop;
                         }
                     }
                     catch (error) {

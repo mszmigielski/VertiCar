@@ -12,18 +12,26 @@ class VescDriver {
 private:
     Stream& _port;  // Referencja do portu szeregowego
     VescUart Vesc;
-    int16_t constraintSpeed = MAX_SPEED;
-
-    struct VescCommand {
-        float dutyL;
-        float dutyR;
+    float maxOnCurrentDuty = MAX_ON_CURRENT_DUTY; // Maksymalne obroty silnika (do dostosowania w zależności od silnika i ustawień VESC)
+    struct VescDuty {
+        float dutyL=0;
+        float dutyR=0;
     };
-    VescCommand Command;
-    
+    VescDuty CommandDuty;
+
+    struct VescCurrent {
+        float currentL=0;
+        float currentR=0;
+    };
+    VescCurrent CommandCurrent;
+    //#TODO: usunąć powyższe struktury i zastąpić bezpośrednio w metodach setDuty i setCurrent
+
 public:
 
     VescDriver(Stream& port);
-    void move(SpeedCommand& cmd);
+    void setDuty(SpeedCommand& cmd);
+    void setCurrent(SpeedCommand& cmd);
+    void setBrakeCurrent(float brakeCurrent);
     bool update();
     
     VescUart::dataPackage dataL;

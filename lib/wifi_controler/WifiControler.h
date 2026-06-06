@@ -31,5 +31,5 @@ public:
 
     void initAP(const char* ssid, const char* password);
     void loop();
-    void sendTelemetry(float angle, float current);
+    void sendTelemetry(float angle, float current, int loopTime);
 };

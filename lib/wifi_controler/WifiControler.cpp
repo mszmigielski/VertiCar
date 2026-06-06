@@ -100,13 +100,13 @@ void WifiControler::loop() {
 }
 
 
-void WifiControler::sendTelemetry(float angle, float current) {
+void WifiControler::sendTelemetry(float angle, float current, int loopTime) {
     static unsigned long lastTime = 0;
     if (millis() - lastTime < 100) { // Limituj wysyłanie danych telemetrycznych do co 100 ms
         return;
     }
     char buffer[64];
-    snprintf(buffer, sizeof(buffer), "{\"t\":\"tele\",\"ang\":%.2f,\"curr\":%.2f}", angle, current);
+    snprintf(buffer, sizeof(buffer), "{\"t\":\"tele\",\"ang\":%.2f,\"curr\":%.2f,\"loop\":%d}", angle, current, loopTime);
 
     _webSocket.broadcastTXT(buffer);
 }

@@ -1,13 +1,10 @@
 #pragma once
 
 
-// Konfiguracja dla sterownika Hoverboard
-#define HOVER_SERIAL_BAUD   115200
-#define HOVER_RX_PIN 8  // Podłącz do TX płyty Hoverboarda
-#define HOVER_TX_PIN 18  // Podłącz do RX płyty Hoverboarda
-#define START_FRAME         0xABCD
-#define MAX_SPEED           0.2 // Maksymalna prędkość (dostosuj do potrzeb)
 
+#define MAX_DUTY           0.2 // Maksymalna prędkość (dostosuj do potrzeb)
+#define MAX_CURRENT        5.0 // Maksymalny prąd (dostosuj do potrzeb)
+#define MAX_ON_CURRENT_DUTY           0.3 // Maksymalne obroty silnika (dostosuj do potrzeb)  
 // Konfiguracja dla WiFi
 #define WIFI_SSID "VertiCar_AP"
 #define WIFI_PASSWORD "verticar123"

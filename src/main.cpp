@@ -20,7 +20,7 @@ unsigned long previousMillis = 0;
 PIDTunings pidTunings;
 float tau = 0.03f; // Stała czasowa filtru dla członu D (do dostosowania w zależności od charakterystyki systemu)
 PidControler PID(1,0,0, tau);
-
+unsigned long timer = millis();
 
 void setup() {
   // Port Serial0 (USB) do podglądu danych na komputerze (Monitor Portu Szeregowego)
@@ -55,17 +55,25 @@ void setup() {
 
 void loop() {
   panel.update(); // Update the control panel state
+  static bool state = false; // Przykładowy stan, który można kontrolować przyciskiem
+  
   wificontroler.loop(); // Obsługa WiFi i WebSocketów
   SpeedCommand s_cmd = wificontroler.getCommand(); // Pobierz aktualne polecenie prędkości i skrętu
-  vescDriver.move(s_cmd); // Wyślij polecenie do VESC
-
+  vescDriver.setCurrent(s_cmd); // Wyślij polecenie do VESC
   imu.update(); // Aktualizacja danych z IMU
   float pitch = imu.getPitch(); // Przykładowe pobranie kąta pitch (możesz też pobrać yaw i roll)
-  wificontroler.sendTelemetry(pitch, 0.0f); // Wyślij dane telemetryczne do przeglądarki
-  
+  float current = vescDriver.dataR.avgMotorCurrent + vescDriver.dataL.avgMotorCurrent; 
   float dt = (millis() - previousMillis) / 1000.0f; // Oblicz czas od ostatniej aktualizacji w sekundach
   previousMillis = millis(); // Zaktualizuj czas poprzedniej aktualizacji
-  PID.update(0, pitch, dt);
- 
+
+  if (millis() - timer > 50){
+    PID.update(0, pitch, dt);
+    state = vescDriver.update(); // Update VESC state (read data, etc.)
+    wificontroler.sendTelemetry(pitch, current, (int)(dt * 1000)); // Wyślij dane telemetryczne do przeglądarki
+    timer = millis();
+    Serial.print(vescDriver.dataR.dutyCycleNow);
+    Serial.print(",");
+    Serial.println(vescDriver.dataL.dutyCycleNow);
+  }
   
 }
