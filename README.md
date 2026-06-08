@@ -21,6 +21,10 @@ This is a presonal portfolio projekt where the goal is to gain knowledge and exp
 ### Using vesc drivers
 
 ### To Do:
-- controler input sequence after lost server
-- check the connection to server
-- adjust motor driver disconneted timeout
+- adjust vesc driver disconnection timeout
+- tune PID values for speed controler
+- consider lqr
+- state machine for different modes of operation
+- micro ROS interface
+- standup procedure 
+- RTOS architecture 
