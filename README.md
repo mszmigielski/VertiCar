@@ -18,7 +18,8 @@ This is a presonal portfolio projekt where the goal is to gain knowledge and exp
 - implemented safety management 
 
 
-### Using vesc drivers
+### Current state
+
 
 ### To Do:
 - adjust vesc driver disconnection timeout
