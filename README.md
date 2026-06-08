@@ -29,3 +29,7 @@ This is a presonal portfolio projekt where the goal is to gain knowledge and exp
 - micro ROS interface
 - standup procedure 
 - RTOS architecture 
+
+
+### License 
+GPL v3.0
